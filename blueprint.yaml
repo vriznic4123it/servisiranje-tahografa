@@ -1,0 +1,94 @@
+# blueprint.yaml - Specifikacija strukture aplikacije za servis tahografa
+
+models:
+  User:
+    name: string
+    email: string unique
+    password: string
+    role: string default:'klijent'
+    timestamps: true
+
+  Vozilo:
+    user_id: foreignId:users
+    registracija: string unique
+    marka: string
+    model: string
+    timestamps: true
+
+  Servis:
+    user_id: foreignId:users
+    serviser_id: foreignId:users nullable
+    vozilo_id: foreignId:vozila nullable
+    vozilo: string nullable
+    tip_tahografa: string
+    opis_problema: text nullable
+    termin: datetime
+    telefon: string nullable
+    status: string default:'zakazano'
+    broj_plombe: string nullable
+    timestamps: true
+
+  Deo:
+    naziv: string
+    kod: string unique
+    kolicina: integer default:0
+    dobavljac: string nullable
+    cena: decimal:8,2 nullable
+    timestamps: true
+
+  Dijagnostika:
+    servis_id: foreignId:servisi
+    opis_problema: text nullable
+    rezultati_dijagnostike: text nullable
+    preporuceni_radovi: text nullable
+    izvrseni_radovi: text nullable
+    serviser_id: foreignId:users nullable
+    timestamps: true
+
+controllers:
+  UserController:
+    resource: api
+  VoziloController:
+    resource: web
+  ServisController:
+    resource: web
+    actions: index, create, store, show, edit, update, destroy, createZakazivanje, zakazi, otkazi, istorija, dashboard
+  ServiserController:
+    actions: dashboard, servisniZahtevi, pokreniDijagnostiku, servisniZapis, dijagnostika, sacuvajDijagnostiku, popravke, zavrsiPopravku, zalihe, aktivniServisi, detaljiServisa
+  DeoController:
+    resource: web
+  DijagnostikaController:
+    resource: web
+
+seeders:
+  - DatabaseSeeder
+  - UsersTableSeeder
+  - VoziloSeeder
+  - ServisSeeder
+  - DeoSeeder
+  - DijagnostikaSeeder
+
+routes:
+  auth:
+    - login, register, logout, password reset
+    
+  web:
+    - home: /home -> ServisController@index
+    - servis.zakazi: GET /servisi/zakazi -> ServisController@createZakazivanje
+    - servis.zakazi: POST /zakazi-servis -> ServisController@zakazi
+    
+  serviser:
+    prefix: /serviser
+    middleware: auth
+    - serviser.dashboard: GET /dashboard -> ServiserController@dashboard
+    - serviser.servisni-zahtevi: GET /servisni-zahtevi -> ServiserController@servisniZahtevi
+    - serviser.pokreni-dijagnostiku: POST /servis/{servis}/pokreni-dijagnostiku -> ServiserController@pokreniDijagnostiku
+    - serviser.dijagnostika.show: GET /dijagnostika/{servis} -> ServiserController@dijagnostika
+    - serviser.dijagnostika.sacuvaj: POST /dijagnostika/{servis}/sacuvaj -> ServiserController@sacuvajDijagnostiku
+    - serviser.popravke: GET /popravke -> ServiserController@popravke
+
+  resources:
+    - servisi: ServisController
+    - vozila: VoziloController
+    - delovi: DeoController
+    - diagnostike: DijagnostikaController

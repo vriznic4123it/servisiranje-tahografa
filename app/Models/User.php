@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // DODAJ OVO!
     ];
 
     /**
@@ -44,5 +45,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Helper metode za role
+    public function isKlijent()
+    {
+        return $this->role === 'klijent';
+    }
+
+    public function isServiser()
+    {
+        return $this->role === 'serviser';
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }

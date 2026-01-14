@@ -13,11 +13,25 @@ class ServisSeeder extends Seeder
     {
         // Uzimamo prvog klijenta
         $user = User::where('role', 'klijent')->first();
+        
+        if (!$user) {
+            // Kreiraj klijenta ako ne postoji
+            $user = User::factory()->create([
+                'role' => 'klijent',
+                'name' => 'Test Klijent',
+                'email' => 'klijent@test.com',
+                'password' => bcrypt('password')
+            ]);
+        }
 
         // Uzimamo ili kreiramo prvo vozilo za klijenta
         $vozilo = Vozilo::firstOrCreate(
-            ['registracija' => 'BG123AB', 'user_id' => $user->id],
-            ['marka' => 'Torp', 'model' => 'X1']
+            ['registracija' => 'BG123AB'],
+            [
+                'marka' => 'Torp', 
+                'model' => 'X1',
+                'user_id' => $user->id
+            ]
         );
 
         // prvo vozilo i servis
@@ -33,8 +47,12 @@ class ServisSeeder extends Seeder
         ]);
 
         $vozilo2 = Vozilo::firstOrCreate(
-            ['registracija' => 'BG456CD', 'user_id' => $user->id],
-            ['marka' => 'Franecki', 'model' => 'Z2']
+            ['registracija' => 'BG456CD'],
+            [
+                'marka' => 'Franecki', 
+                'model' => 'Z2',
+                'user_id' => $user->id
+            ]
         );
 
         // Drugo vozilo i servis
@@ -46,23 +64,6 @@ class ServisSeeder extends Seeder
             'opis_problema' => 'Test problem 2',
             'termin' => now()->addDays(5),
             'telefon' => '0639876543',
-            'status' => 'zakazano',
-        ]);
-
-        // Treće vozilo i servis
-        $vozilo3 = Vozilo::firstOrCreate(
-            ['registracija' => 'BG789EF', 'user_id' => $user->id],
-            ['marka' => 'Crist', 'model' => 'M3']
-        );
-
-        Servis::create([
-            'user_id' => $user->id,
-            'vozilo_id' => $vozilo3->id,
-            'vozilo' => $vozilo3->registracija . ' - ' . $vozilo3->marka . ' ' . $vozilo3->model,
-            'tip_tahografa' => 'analogni',
-            'opis_problema' => 'Test problem 3',
-            'termin' => now()->addDays(7),
-            'telefon' => '0631112222',
             'status' => 'zakazano',
         ]);
     }

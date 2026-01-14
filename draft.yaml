@@ -1,4 +1,4 @@
-# blueprint.yaml - Specifikacija strukture aplikacije za servis tahografa
+# draft.yaml - Specifikacija strukture aplikacije za servis tahografa
 
 models:
   User:
